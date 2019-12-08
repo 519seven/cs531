@@ -1,0 +1,179 @@
+1 Purpose
+===============================================================================
+
+The purpose of this assignment is to help you understand some of the details of
+programming in C so that you can then understand the various kinds of vulnera-
+bilities that arise in C programs. 
+
+
+2 Part 1
+===============================================================================
+
+Recall that the memory associated with a process is organized as follows:
+ 
+For Part 1, you must write a small C program that you can use to build a model 
+of memory on your platform. Specifically, you must create a file named memory.c
+that, when executed, prints all of the following addresses (properly labeled) 
+to the console. 
+	•	The "bottom" of the stack (e.g., in Linux, the highest memory location 
+        of the stack).
+	•	The "start" of the heap (e.g., in Linux, the lowest memory location of 
+        the heap).
+	•	The "start" of the uninitialized data block.
+	•	The "start" of the initialized data block.
+	•	The address of main.
+
+It may print other addresses as well (if you find them helpful).
+
+For example, you may want to put more than one thing on the heap, or you may 
+want to print the address of a local variable. 
+
+memory.c must have a function with the signature 
+
+    int main(int argc, char* argv[])
+
+It may have other functions as well.
+
+Hints: 
+    You will probably want to declare variables of various kinds and print
+    their addresses (perhaps using the "%p" conversion specifier).
+    - Be careful since the order of the statements will matter.
+    
+    You will probably also want to use the address of at least one of the 
+    formal parameters of main.
+    - Obviously, if the addresses do not conform to what you know about 
+      process memory, you should re-think what you are doing and how you 
+      are doing it. 
+
+
+3 Part 2
+===============================================================================
+
+For Part 2, you must interpret a small disassembled C program, and explain what
+happens when one function calls another.
+
+3.1 Getting Started
+
+To get started, you must create a file named simple.c that contains the 
+following C program.
+
+    #include <stdio.h>
+    #include <string.h>
+
+    void foo(const char* input)
+    {
+        printf("In foo()");
+    }
+
+    void bar(void)
+    {
+        printf("In bar()");
+    }
+
+    int main(int argc, char* argv[])
+    {
+        foo("CS531");
+        return 0;
+    }
+    
+Then, you must compile the program and execute it using gdb. Next, in gdb, en-
+ter the commands "disassemble main" and "disassemble foo". Which will provide
+you with two different assembler dumps. 
+
+3.2 Tasks
+
+Create a document that contains the two assembler dumps and annotate each 
+statement (i.e., explain the purpose of each statement in the assembler dumps). 
+
+
+4 Part 3
+===============================================================================
+
+For Part 3, you must create a program that has a buffer overflow vulnerability 
+and then attempt to take advantage of that vulnerability.
+
+4.1 Getting Started
+
+To start, copy simple.c to vulnerable.c. Next, replace the call to print in the
+foo function in vulnerable.c with code that assigns characters to an array of 
+char and then copies the array pointed to by the parameter input into that 
+array. For example, your foo function might look like the following.
+
+void foo(const char* input)
+{
+  char buf[12] = {"\x99\x99\x99\x99\x99\x99\x99\x99\x99\x99\x99\x99"};
+
+  // This will overrun the buffer if the array pointed to by
+  // input is more than 12 characters long
+  strcpy(buf, input);
+}
+
+4.2 Causing Harm - Availability
+
+Modify the main function of vulnerable.c in such a way that the buffer overflow
+vulnerability causes the program to crash. Then, create a document that care-
+fully explains how the vulnerability was exploited and why the program crashed.
+Note that you may need to disable one or more security features of your devel-
+opment and/or run-time environment in order to exploit the vulnerability. If 
+so, your document must include an explanation of what features were disabled, 
+how they were disabled, and why they needed to be disabled. It should also in-
+clude a careful description of your development and run-time environment (so 
+that the exploit can be replicated). 
+
+4.3 Causing Harm - Integrity
+
+Now, modify the main function of vulnerable.c in such a way that the buffer 
+overflow vulnerability causes the return from the call to foo to execute the 
+function bar.
+
+\x00\x00\x00\x00\x00\x00\x07\x97 <bar>:
+
+Little endian
+\x97\x07\x00\x00\x00\x00\x00\x00
+
+32-bit:
+00000675
+Little endian:
+\x75\x06\x00\x00
+
+Again, you may need to disable security features in order to exploit the vul-
+nerability in this way. Again, if so, document what you did and why. 
+
+4.4 A Caveat
+
+Depending on your development environment, you may find it difficult to exploit
+the buffer oveflow vulnerability in vulnerable.c. If so, document every at-
+tempt, explain why you thought the attempt would exploit the vulnerability, and
+why, in the end, it did not. (Rememember, the point of this assignment is not 
+to verify that you can attack a system but to help you write code that is not 
+vulnerable to attacks. So, as long as you understand the issues, you will have 
+succeeded at this assignment.) 
+
+
+5 Submission
+===============================================================================
+
+You must submit the following (individual documents, not in a .zip file) using 
+Canvas.
+	1.	A document named part1.pdf containing the source code for memory.c 
+	2.	A document named part2.pdf containing the annotated assembler dumps of 
+        simple.c.
+	3.	A document named part3a.pdf containing vulnerable.c, the exploit code 
+        that caused the program to crash, a description of that code, and the 
+        changes you needed to make to the environment.
+	4.	A document named part3b.pdf containing vulnerable.c (if you modified 
+        it) exploit code that caused the program to execute bar, a description 
+        of that code, and the changes you needed to make to the environment.
+
+
+6 A Reminder
+===============================================================================
+Remember to re-enable any security features that you had to disable to complete
+this assignment. 
+
+
+7 Visibility
+===============================================================================
+Your answers may be made available to other students in the course. 
+Department of Computer Science 
+Copyright 2017 
